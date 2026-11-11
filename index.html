@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="description" content="Evalúa tu relación como un proyecto: 26 preguntas en 7 áreas y un informe Go / No-Go con matriz de riesgos.">
+<meta name="description" content="Evalúa tu relación como un proyecto: 39 preguntas en 8 áreas y un informe Go / No-Go con matriz de riesgos.">
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>Go / No-Go de Pareja</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -189,6 +189,7 @@ const AREAS = [
   {k:"fin", t:"Finanzas", d:"Cómo maneja el dinero y cómo lo vería en un hogar compartido."},
   {k:"cre", t:"Crecimiento y futuro", d:"Si tiene metas, si quiere mejorar como persona y si te impulsa a crecer."},
   {k:"car", t:"Carácter y hábitos", d:"Vicios y la forma en que trata a los demás cuando no tiene que quedar bien."},
+  {k:"psi", t:"Perfil psicológico", d:"Rasgos más profundos de su forma de ser: empatía, manipulación, ego, rencor y crueldad. Son las señales que más cuesta ver cuando hay enamoramiento."},
   {k:"tu",  t:"Tú", d:"Cómo te sientes tú. Responde con total honestidad: nadie más verá estas respuestas."}
 ];
 // o: [texto, puntos, banderaRoja]
@@ -219,15 +220,29 @@ const Q = [
  {a:5,w:3,q:"¿Tiene algún vicio (alcohol, drogas, apuestas, pornografía) que afecte su vida o la relación?",o:[["Ninguno",4],["Consumo social y controlado",3],["Consumo frecuente que causa problemas",1],["Una adicción que no reconoce ni trata",0,1]],f:"Sin vicios que afecten la relación",r:"Vicios o adicciones",m:"Una adicción necesita tratamiento profesional. No avances hasta que la reconozca y la trate."},
  {a:5,w:2,q:"¿Cómo trata a quienes no le aportan nada (meseros, empleados, desconocidos)?",o:[["Con respeto y amabilidad",4],["Con educación",3],["Con indiferencia o prepotencia",1],["Con desprecio o humillación",0]],f:"Trata con respeto a todos",r:"Trato despectivo hacia los demás",m:"Presta atención a este detalle: con el tiempo, así también te tratará a ti."},
 
- {a:6,w:3,q:"¿Qué tan cómodo/a y en paz te sientes con esta persona?",o:[["Totalmente: puedo ser yo",4],["Casi siempre",3],["Con frecuencia siento tensión",1],["Siento miedo o ansiedad",0,1]],f:"Te sientes en paz y en libertad",r:"Tensión o miedo en la relación",m:"El miedo nunca es normal en una pareja. Habla con alguien de confianza o con un profesional."},
- {a:6,w:3,q:"¿Te sientes amado/a por esta persona?",o:[["Sí, me lo demuestra con hechos",4],["Casi siempre",3],["Lo dice, pero no lo demuestra",1],["No me siento amado/a",0]],f:"Te sientes amado/a",r:"No te sientes amado/a",m:"Dile cómo necesitas recibir amor. Si después de hablarlo nada cambia, tómalo en serio."},
- {a:6,w:2,q:"¿Están conformes con el afecto y la intimidad en la relación?",o:[["Sí, los dos",4],["Casi siempre",3],["Hay diferencias que nos afectan",1],["Hay rechazo o presión constante",0]],f:"Afecto e intimidad en armonía",r:"Desacuerdo en afecto e intimidad",m:"Hablen de sus expectativas con honestidad y sin culpas. Es un tema clave en el matrimonio."},
- {a:6,w:2,q:"¿Qué opinan de esta persona tus amigos y familiares cercanos?",o:[["Les cae muy bien",4],["Bien, con alguna reserva",3],["Varios me han advertido sobre {e}",1],["Casi todos me dicen que no me conviene",0]],f:"Tu gente cercana aprueba la relación",r:"Advertencias de tu gente cercana",m:"Pregúntales qué ven exactamente. No tienen la última palabra, pero ven lo que el enamoramiento tapa."},
- {a:6,w:3,q:"¿Por qué quieres dar este paso?",o:[["Por amor, y porque veo un futuro juntos",4],["Por amor, aunque siento algo de presión",3],["Principalmente por presión (edad, familia, sociedad)",1],["Por miedo a quedarme solo/a",0]],f:"Tu motivación es el amor",r:"Decisión movida por presión o miedo",m:"Date tiempo. Una decisión tomada por presión o miedo se suele lamentar después."},
- {a:6,w:3,q:"Si nada cambiara en 10 años, ¿serías feliz con esta persona?",o:[["Sí, sin duda",4],["Probablemente",3],["Tengo muchas dudas",1],["No",0]],f:"Te ves feliz a largo plazo",r:"No te ves feliz a largo plazo",m:"Esta respuesta pesa más que cualquier puntaje. Escúchala."}
+ {a:6,w:3,q:"Cuando estás mal, triste o enfermo/a, ¿cómo responde?",o:[["Se preocupa de verdad y me acompaña",4],["Me apoya a su manera",3],["Le resulta indiferente o le molesta",1],["Se burla, se aleja o lo usa en mi contra",0,1]],f:"Tiene empatía real contigo",r:"Falta de empatía",m:"La empatía casi no se aprende en la adultez. Fíjate en cómo reacciona ante el dolor de otros, no solo ante el tuyo."},
+ {a:6,w:3,q:"¿Te ha hecho dudar de tu memoria o de tu juicio con frases como «eso nunca pasó» o «estás exagerando»?",o:[["Nunca",4],["Alguna vez, sin mala intención",3],["Con frecuencia",1],["Constantemente; ya dudo de mí mismo/a",0,1]],f:"No te manipula",r:"Manipulación emocional (hacerte dudar de ti)",m:"Anota los hechos cuando ocurren y compártelos con alguien de confianza. Si dudas de tu propia memoria, busca orientación profesional."},
+ {a:6,w:2,q:"¿Necesita ser el centro de atención y sentirse superior a los demás?",o:[["No, es una persona humilde",4],["Le gusta el reconocimiento, lo normal",3],["Mucho; se molesta si no le admiran",1],["Todo gira en torno a su ego; desprecia a los demás",0]],f:"Humildad",r:"Rasgos narcisistas",m:"Observa si puede alegrarse de tus logros sin competir. Un ego que no deja espacio para ti tiende a crecer con el tiempo."},
+ {a:6,w:2,q:"Cuando algo sale mal, ¿asume su parte o siempre es la víctima?",o:[["Asume su parte y pide perdón",4],["Le cuesta, pero lo acepta",3],["Casi siempre se justifica o culpa a otros",1],["Siempre se hace la víctima; la culpa es de los demás",0]],f:"Asume sus errores",r:"Victimismo y culpa a los demás",m:"Sin capacidad de asumir errores, los problemas de pareja no se resuelven: solo cambia el culpable."},
+ {a:6,w:2,q:"Cuando alguien le hace daño, ¿cómo reacciona?",o:[["Pone límites y logra perdonar",4],["Se aleja, sin rencor",3],["Guarda rencor por mucho tiempo",1],["Busca vengarse o hacer daño de vuelta",0,1]],f:"Sabe perdonar",r:"Rencor o deseo de venganza",m:"Pregúntate cómo reaccionaría contigo el día que le falles. Así como trata a quien le hiere, te tratará a ti."},
+ {a:6,w:3,q:"¿Le has visto disfrutar del sufrimiento ajeno (de personas o animales) o ser cruel cuando se enoja?",o:[["Nunca",4],["No, aunque a veces es dura con sus palabras",3],["Ha tenido actos crueles que me sorprendieron",1],["Sí, disfruta hacer daño",0,1]],f:"Sin rasgos de crueldad",r:"Rasgos de crueldad",m:"La crueldad es una de las señales más serias que existen. No la justifiques por el enojo ni por su historia."},
+ {a:6,w:2,q:"¿Es la misma persona en privado que en público?",o:[["Sí, siempre es igual",4],["Casi igual",3],["Cambia bastante según quién esté presente",1],["Tiene dos caras: encantadora afuera y otra persona adentro",0]],f:"Coherente en público y en privado",r:"Doble cara",m:"Confía en la persona que ves en privado: esa es con la que vivirías."},
+ {a:6,w:3,q:"¿Sientes que te valora por quién eres o por lo que le das (dinero, estatus, comodidad)?",o:[["Por quién soy",4],["Mayormente por quién soy",3],["Siento que le importa más lo que le doy",1],["Siento que me usa",0,1]],f:"Te valora por quién eres",r:"Interés por lo que le das",m:"Observa cómo actúa cuando no puedes darle lo de siempre. Ahí se ve el verdadero interés."},
+
+ {a:7,w:3,q:"¿Qué tan cómodo/a y en paz te sientes con esta persona?",o:[["Totalmente: puedo ser yo",4],["Casi siempre",3],["Con frecuencia siento tensión",1],["Siento miedo o ansiedad",0,1]],f:"Te sientes en paz y en libertad",r:"Tensión o miedo en la relación",m:"El miedo nunca es normal en una pareja. Habla con alguien de confianza o con un profesional."},
+ {a:7,w:3,q:"¿Te sientes amado/a por esta persona?",o:[["Sí, me lo demuestra con hechos",4],["Casi siempre",3],["Lo dice, pero no lo demuestra",1],["No me siento amado/a",0]],f:"Te sientes amado/a",r:"No te sientes amado/a",m:"Dile cómo necesitas recibir amor. Si después de hablarlo nada cambia, tómalo en serio."},
+ {a:7,w:2,q:"¿Están conformes con el afecto y la intimidad en la relación?",o:[["Sí, los dos",4],["Casi siempre",3],["Hay diferencias que nos afectan",1],["Hay rechazo o presión constante",0]],f:"Afecto e intimidad en armonía",r:"Desacuerdo en afecto e intimidad",m:"Hablen de sus expectativas con honestidad y sin culpas. Es un tema clave en el matrimonio."},
+ {a:7,w:2,q:"¿Qué opinan de esta persona tus amigos y familiares cercanos?",o:[["Les cae muy bien",4],["Bien, con alguna reserva",3],["Varios me han advertido sobre {e}",1],["Casi todos me dicen que no me conviene",0]],f:"Tu gente cercana aprueba la relación",r:"Advertencias de tu gente cercana",m:"Pregúntales qué ven exactamente. No tienen la última palabra, pero ven lo que el enamoramiento tapa."},
+ {a:7,w:3,q:"¿Por qué quieres dar este paso?",o:[["Por amor, y porque veo un futuro juntos",4],["Por amor, aunque siento algo de presión",3],["Principalmente por presión (edad, familia, sociedad)",1],["Por miedo a quedarme solo/a",0]],f:"Tu motivación es el amor",r:"Decisión movida por presión o miedo",m:"Date tiempo. Una decisión tomada por presión o miedo se suele lamentar después."},
+ {a:7,w:3,q:"¿Puedes aceptar y sobrellevar sus debilidades y defectos tal como son hoy?",o:[["Sí, los conozco y los acepto",4],["La mayoría, aunque algunos me cuestan",3],["Me molestan mucho; espero que cambie",1],["No los soporto",0]],f:"Aceptas sus defectos",r:"Te cuesta aceptar sus defectos",m:"Haz una lista honesta de sus defectos. Si tu felicidad depende de que cambien, estás apostando a algo que no controlas."},
+ {a:7,w:2,q:"¿Crees que tú le aportas valor a su vida y le ayudas a crecer?",o:[["Sí, claramente es mejor persona conmigo",4],["Creo que sí",3],["No estoy seguro/a",1],["Siento que le perjudico o le estanco",0]],f:"Le aportas valor a su vida",r:"Dudas sobre lo que le aportas",m:"Pregúntale qué valora de ti y en qué siente que le ayudas. Una relación sana es un intercambio en ambas direcciones."},
+ {a:7,w:3,q:"Desde que están juntos, ¿los dos son mejores personas?",o:[["Sí, ambos hemos crecido",4],["En general, sí",3],["Solo crece uno de los dos",1],["Ambos hemos empeorado",0]],f:"Crecen juntos como pareja",r:"La relación no los hace crecer",m:"Piensen en una meta común (personal, espiritual o económica) y vean si pueden avanzar en ella como equipo."},
+ {a:7,w:2,q:"Con esta persona, ¿sigues siendo tú, o has cambiado tu esencia para agradarle?",o:[["Soy yo plenamente",4],["Me adapto un poco, lo normal",3],["He dejado cosas importantes de mí",1],["Ya no me reconozco",0]],f:"Conservas tu esencia",r:"Has perdido parte de tu identidad",m:"Retoma algo importante que hayas dejado (amistades, metas, pasatiempos) y observa cómo reacciona."},
+ {a:7,w:2,q:"¿Estás emocionalmente preparado/a para este compromiso?",o:[["Sí, estoy en paz con mi pasado",4],["Casi; tengo algunas cosas por sanar",3],["Arrastro heridas que afectan esta relación",1],["Busco en esta persona llenar un vacío",0]],f:"Llegas con estabilidad emocional",r:"Heridas propias sin sanar",m:"Nadie puede llenar un vacío que es tuyo. Trabajar tus propias heridas, con ayuda si hace falta, protege cualquier relación."},
+ {a:7,w:3,q:"Si nada cambiara en 10 años, ¿serías feliz con esta persona?",o:[["Sí, sin duda",4],["Probablemente",3],["Tengo muchas dudas",1],["No",0]],f:"Te ves feliz a largo plazo",r:"No te ves feliz a largo plazo",m:"Esta respuesta pesa más que cualquier puntaje. Escúchala."}
 ];
 
-const KEY="gonogo-pareja-v1";
+const KEY="gonogo-pareja-v2";
 let S = {name:"", g:"f", ans:{}, step:-1};
 function load(){try{const r=localStorage.getItem(KEY);if(r){const o=JSON.parse(r);if(o&&typeof o==="object")return o}}catch(e){}return null}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
@@ -274,7 +289,7 @@ function renderIntro(){
         <button class="btn primary" id="btnStart">Comenzar evaluación</button>
         ${resumable?`<button class="btn" id="btnResume">Continuar la evaluación guardada (${Object.keys(saved.ans).length} de ${Q.length})</button>`:""}
       </div>
-      <p class="note">Son ${Q.length} preguntas en ${AREAS.length} áreas, unos 8 minutos. Tus respuestas no se envían a ningún lado: se guardan solo en este navegador.</p>
+      <p class="note">Son ${Q.length} preguntas en ${AREAS.length} áreas, unos ${Math.round(Q.length/3)} minutos. Tus respuestas no se envían a ningún lado: se guardan solo en este navegador.</p>
     </section>
 
     <section class="sec">
@@ -329,7 +344,7 @@ function renderStep(){
     <div class="area-head">
       <span class="eyebrow">Área ${i+1} de ${AREAS.length} · ${answeredCount()} de ${Q.length} respondidas</span>
       <h2>${esc(areaName(i))}</h2>
-      <p class="muted">${esc(i===6?a.d:tx(a.d))}</p>
+      <p class="muted">${esc(a.k==="tu"?a.d:tx(a.d))}</p>
     </div>
     ${a.hint?`<p class="hint">${esc(a.hint)}</p>`:""}
     <form id="f" class="wrap" style="gap:14px" novalidate>
