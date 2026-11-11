@@ -1,0 +1,558 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Evalúa tu relación como un proyecto: 26 preguntas en 7 áreas y un informe Go / No-Go con matriz de riesgos.">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Go / No-Go de Pareja</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Layout: una columna tipo "expediente de proyecto": cabecera, pasos por área, informe con matriz probabilidad × impacto */
+:root{
+  --bg:#F3F4F7; --surface:#FFFFFF; --sunk:#E9EBF0; --ink:#1A2030; --muted:#5B6476; --line:#D9DDE5;
+  --accent:#9E2F5A; --accent-ink:#FFFFFF; --accent-soft:#F6E6EC;
+  --go:#1E7F55; --go-soft:#E2F2EA; --cond:#B07A0C; --cond-soft:#F8EFD9; --nogo:#BE3329; --nogo-soft:#F8E3E1;
+  --display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --body:"Instrument Sans", "Segoe UI", system-ui, sans-serif;
+  --mono:"JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#11141B; --surface:#191E28; --sunk:#222835; --ink:#E8EBF1; --muted:#9BA3B4; --line:#2C3342;
+  --accent:#E77FA5; --accent-ink:#1A0E14; --accent-soft:#3A2230;
+  --go:#4CC48D; --go-soft:#1B3328; --cond:#E9B44C; --cond-soft:#3A2F17; --nogo:#F07068; --nogo-soft:#3D2120;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#11141B; --surface:#191E28; --sunk:#222835; --ink:#E8EBF1; --muted:#9BA3B4; --line:#2C3342;
+  --accent:#E77FA5; --accent-ink:#1A0E14; --accent-soft:#3A2230;
+  --go:#4CC48D; --go-soft:#1B3328; --cond:#E9B44C; --cond-soft:#3A2F17; --nogo:#F07068; --nogo-soft:#3D2120;
+  color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.55;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 48px}
+.wrap{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:28px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.1}
+p{margin:0}
+.muted{color:var(--muted)}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+
+header.top{display:flex;justify-content:space-between;align-items:center;gap:12px;padding-block:20px 4px;border-bottom:1px solid var(--line);padding-bottom:16px}
+.brand{font-family:var(--display);font-weight:800;font-size:18px;display:flex;align-items:center;gap:10px}
+.brand .mark{display:inline-grid;grid-template-columns:repeat(2,9px);gap:2px}
+.brand .mark i{width:9px;height:9px;border-radius:2px;display:block}
+.brand .mark i:nth-child(1){background:var(--go)}.brand .mark i:nth-child(2){background:var(--cond)}
+.brand .mark i:nth-child(3){background:var(--cond)}.brand .mark i:nth-child(4){background:var(--nogo)}
+
+button{font:inherit;cursor:pointer}
+.btn{border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:11px 18px;border-radius:10px;font-weight:600}
+.btn:hover{border-color:var(--muted)}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn.primary:hover{filter:brightness(1.07)}
+.btn.ghost{background:transparent;border-color:transparent;color:var(--muted)}
+.btn:focus-visible,input:focus-visible+label,.seg button:focus-visible,.step-chip:focus-visible,input[type=text]:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+/* Intro */
+.hero{display:flex;flex-direction:column;gap:14px;padding-top:12px}
+.hero h1{font-size:clamp(38px,8vw,64px);font-weight:800;letter-spacing:-.02em}
+.hero h1 .go{color:var(--go)}.hero h1 .nogo{color:var(--nogo)}
+.hero p.lead{font-size:18px;max-width:58ch;color:var(--muted)}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:18px}
+.field{display:flex;flex-direction:column;gap:8px}
+.field label.lbl{font-weight:600}
+input[type=text]{font:inherit;padding:11px 14px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink);width:100%}
+.seg{display:inline-flex;background:var(--sunk);border-radius:10px;padding:4px;gap:4px;flex-wrap:wrap}
+.seg button{border:0;background:transparent;color:var(--ink);padding:8px 18px;border-radius:7px;font-weight:600}
+.seg button[aria-pressed="true"]{background:var(--surface);box-shadow:0 1px 3px rgba(0,0,0,.15)}
+.row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.how{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.how div{display:flex;flex-direction:column;gap:6px;min-width:0}
+.how b{font-family:var(--mono);font-size:13px;color:var(--accent)}
+.areas-list{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-size:13px;padding:5px 11px;border-radius:999px;background:var(--sunk);color:var(--ink)}
+.sample{display:grid;grid-template-columns:auto 1fr;gap:20px;align-items:center;border:1px dashed var(--line);border-radius:14px;padding:18px}
+.sample .tag{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.note{font-size:14px;color:var(--muted)}
+
+/* Cuestionario */
+.stepper{display:flex;gap:6px;flex-wrap:wrap}
+.step-chip{border:1px solid var(--line);background:var(--surface);color:var(--muted);border-radius:999px;padding:5px 12px;font-size:13px;font-weight:600}
+.step-chip.done{color:var(--ink);border-color:var(--go)}
+.step-chip.current{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.step-chip:disabled{opacity:.55;cursor:default}
+.progress{height:6px;background:var(--sunk);border-radius:99px;overflow:hidden}
+.progress span{display:block;height:100%;background:var(--accent);transition:width .3s}
+.area-head{display:flex;flex-direction:column;gap:6px}
+.area-head h2{font-size:clamp(28px,5vw,38px);font-weight:700}
+.q{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:12px}
+.q.missing{border-color:var(--nogo);box-shadow:0 0 0 3px var(--nogo-soft)}
+.q-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.q h3{font-family:var(--body);font-weight:600;font-size:17px;line-height:1.35}
+.weight{flex:none;display:flex;gap:3px;align-items:center;padding-top:6px}
+.weight i{width:7px;height:7px;border-radius:50%;background:var(--line)}
+.weight i.on{background:var(--ink)}
+.opts{display:grid;gap:8px}
+.opt input{position:absolute;opacity:0;pointer-events:none}
+.opt label{display:flex;gap:12px;align-items:center;padding:11px 14px;border:1px solid var(--line);border-radius:10px;cursor:pointer;background:var(--bg)}
+.opt label:hover{border-color:var(--muted)}
+.opt .dot{flex:none;width:18px;height:18px;border-radius:50%;border:2px solid var(--muted);display:grid;place-items:center}
+.opt input:checked+label{border-color:var(--accent);background:var(--accent-soft)}
+.opt input:checked+label .dot{border-color:var(--accent)}
+.opt input:checked+label .dot::after{content:"";width:8px;height:8px;border-radius:50%;background:var(--accent)}
+.flag{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--nogo);white-space:nowrap}
+.hint{font-size:14px;color:var(--muted);background:var(--sunk);padding:10px 14px;border-radius:10px}
+.nav{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.err{color:var(--nogo);font-weight:600;font-size:14px}
+
+/* Informe */
+.verdict{border-radius:18px;padding:26px;display:grid;grid-template-columns:1fr auto;gap:20px;align-items:center}
+.verdict.go{background:var(--go-soft)}.verdict.cond{background:var(--cond-soft)}.verdict.nogo{background:var(--nogo-soft)}
+.verdict .v{font-family:var(--display);font-weight:800;font-size:clamp(40px,9vw,68px);letter-spacing:-.02em;line-height:1}
+.verdict.go .v{color:var(--go)}.verdict.cond .v{color:var(--cond)}.verdict.nogo .v{color:var(--nogo)}
+.verdict .sub{margin-top:10px;max-width:46ch}
+.ring{position:relative;width:132px;height:132px}
+.ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ring .num{position:absolute;inset:0;display:grid;place-items:center;text-align:center}
+.ring .num b{font-family:var(--mono);font-size:30px;display:block;line-height:1}
+.ring .num small{font-size:11px;color:var(--muted);display:block;max-width:90px;line-height:1.2;margin-top:4px}
+.balance{display:flex;flex-direction:column;gap:8px}
+.balance .bar{display:flex;height:14px;border-radius:99px;overflow:hidden;background:var(--sunk)}
+.balance .bar .b{background:var(--go)}.balance .bar .r{background:var(--nogo)}
+.balance .legend{display:flex;justify-content:space-between;font-size:14px;gap:12px;flex-wrap:wrap}
+.sec{display:flex;flex-direction:column;gap:14px}
+.sec h2{font-size:24px;font-weight:700}
+.flags{border:2px solid var(--nogo);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:8px;background:var(--surface)}
+.flags h3{color:var(--nogo);font-size:18px}
+.flags ul{margin:0;padding-left:20px}
+.areas{display:flex;flex-direction:column;gap:12px}
+.arow{display:grid;grid-template-columns:150px 1fr 48px;gap:12px;align-items:center}
+.arow .track{height:12px;background:var(--sunk);border-radius:99px;overflow:hidden}
+.arow .fill{height:100%;border-radius:99px}
+.arow .pct{text-align:right;font-weight:700}
+.matrix-wrap{display:grid;grid-template-columns:minmax(0,auto) minmax(0,1fr);gap:24px;align-items:start}
+.matrix{display:grid;grid-template-columns:22px repeat(5,minmax(34px,52px));grid-template-rows:repeat(5,minmax(34px,52px)) 22px;gap:3px}
+.cell{border-radius:6px;display:grid;place-items:center;font-family:var(--mono);font-weight:700;font-size:14px}
+.cell.z-low{background:var(--go-soft)}.cell.z-mid{background:var(--cond-soft)}.cell.z-high{background:var(--nogo-soft)}
+.cell .n{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:var(--ink);color:var(--bg);font-size:12px}
+.ax{font-family:var(--mono);font-size:11px;color:var(--muted);display:grid;place-items:center}
+.matrix-legend{display:flex;flex-direction:column;gap:10px;font-size:14px;min-width:0}
+.sw{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-1px;margin-right:6px}
+.list{display:flex;flex-direction:column;gap:10px}
+.item{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:6px}
+.item .meta{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.pill{font-family:var(--mono);font-size:11px;padding:3px 8px;border-radius:99px;font-weight:700;letter-spacing:.03em}
+.pill.high{background:var(--nogo-soft);color:var(--nogo)}.pill.mid{background:var(--cond-soft);color:var(--cond)}.pill.low{background:var(--go-soft);color:var(--go)}
+.pill.area{background:var(--sunk);color:var(--muted)}
+.item b{font-weight:600}
+.strengths{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.strengths div{background:var(--go-soft);border-radius:10px;padding:10px 14px;font-weight:500;min-width:0}
+.reco{background:var(--surface);border:1px solid var(--line);border-left:5px solid var(--accent);border-radius:12px;padding:20px;display:flex;flex-direction:column;gap:8px}
+.reco p{font-size:17px}
+.disclaimer{font-size:13px;color:var(--muted);border-top:1px solid var(--line);padding-top:16px}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:10px;font-weight:600;font-size:14px;z-index:20}
+textarea.fallback{width:100%;min-height:160px;font:13px var(--mono);background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:10px}
+
+@media (max-width:620px){
+  .how{grid-template-columns:1fr}
+  .verdict{grid-template-columns:1fr}
+  .ring{width:112px;height:112px}
+  .arow{grid-template-columns:1fr 44px}
+  .arow .name{grid-column:1/-1}
+  .matrix-wrap{grid-template-columns:1fr}
+  .strengths{grid-template-columns:1fr}
+  .sample{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand"><span class="mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span>Go / No-Go de Pareja</div>
+    <button class="btn ghost" id="btnRestartTop" hidden>Empezar de nuevo</button>
+  </header>
+  <main id="app"></main>
+</div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+(function(){
+const AREAS = [
+  {k:"fam", t:"Familia", d:"Cómo se lleva con su familia, cómo trata a la tuya y si sabe poner límites."},
+  {k:"rel", t:"En la relación", d:"Cómo se comporta como pareja: conflictos, confianza, respeto y comunicación."},
+  {k:"cri", t:"Como madre", tM:"Como padre", d:"Su trato con los niños y la visión que comparten sobre tener y criar hijos.", hint:"Si no tiene hijos, responde según cómo actúa con los niños de su entorno y cómo se proyecta."},
+  {k:"fin", t:"Finanzas", d:"Cómo maneja el dinero y cómo lo vería en un hogar compartido."},
+  {k:"cre", t:"Crecimiento y futuro", d:"Si tiene metas, si quiere mejorar como persona y si te impulsa a crecer."},
+  {k:"car", t:"Carácter y hábitos", d:"Vicios y la forma en que trata a los demás cuando no tiene que quedar bien."},
+  {k:"tu",  t:"Tú", d:"Cómo te sientes tú. Responde con total honestidad: nadie más verá estas respuestas."}
+];
+// o: [texto, puntos, banderaRoja]
+const Q = [
+ {a:0,w:3,q:"¿Cómo es su relación con sus padres?",o:[["Respetuosa y cercana",4],["Buena, con roces normales",3],["Distante o conflictiva",1],["Desprecio, maltrato o ruptura total sin causa clara",0]],f:"Relación sana con sus padres",r:"Relación conflictiva con sus padres",m:"Pregunta con calma por su historia familiar. La forma en que trata a sus padres suele anticipar cómo tratará a su propia familia."},
+ {a:0,w:2,q:"¿Cómo se lleva con sus hermanos y el resto de su familia?",o:[["Unida, se apoyan",4],["Bien, aunque con poco contacto",3],["Peleas frecuentes",1],["Conflictos graves con casi todos",0]],f:"Buena relación con su familia",r:"Conflictos frecuentes con su familia",m:"Identifica si el conflicto nace de su lado o del de ellos, y si sabe manejarlo sin arrastrarte a ti."},
+ {a:0,w:2,q:"¿Cómo trata a tu familia?",o:[["Con cariño y respeto",4],["Con educación, aunque sin mucha cercanía",3],["Con indiferencia o críticas",1],["Te aleja de tu familia o les falta el respeto",0,1]],f:"Respeta y aprecia a tu familia",r:"Mal trato hacia tu familia",m:"Hablen del lugar que ocupará cada familia. Alejarte de los tuyos es una señal de control."},
+ {a:0,w:3,q:"¿Su familia se mete en las decisiones de la relación?",o:[["Nos respetan como pareja",4],["Opinan, pero {e} pone límites",3],["Se meten seguido y {e} no los frena",1],["Su familia decide por {e}",0]],f:"Pone límites sanos a su familia",r:"Su familia interfiere en la relación",m:"Antes de comprometerse, acuerden que las decisiones de pareja se toman entre los dos."},
+
+ {a:1,w:3,q:"Cuando discuten o no está de acuerdo contigo, ¿cómo reacciona?",o:[["Dialoga con calma y busca solución",4],["Se molesta, pero luego lo habla",3],["Grita, se cierra o te ignora por días",1],["Insulta, humilla, amenaza o agrede",0,1]],f:"Resuelve los conflictos dialogando",r:"Manejo agresivo o evasivo de los conflictos",m:"Acuerden reglas para discutir: sin gritos y con pausas pactadas. Si no mejora, consideren terapia de pareja."},
+ {a:1,w:3,q:"¿Es una persona honesta y fiel?",o:[["Nunca he tenido motivos para dudar",4],["Hubo dudas, pero se aclararon",3],["Hubo mentiras o situaciones sospechosas sin aclarar",1],["Ha sido infiel o miente en cosas graves",0,1]],f:"Honestidad y fidelidad",r:"Dudas sobre su honestidad o fidelidad",m:"Aclaren las situaciones pendientes antes de avanzar. Sin confianza, lo demás no se sostiene."},
+ {a:1,w:3,q:"¿Respeta tu espacio, tus amistades y tus decisiones?",o:[["Sí, confía en mí",4],["Tiene algunos celos normales",3],["Revisa mi teléfono o me limita",1],["Me controla, me aísla o me prohíbe cosas",0,1]],f:"Respeta tu libertad y tu espacio",r:"Celos o conductas de control",m:"Pon límites claros sobre tu teléfono, tus amistades y tu tiempo. El control suele aumentar después del compromiso, no disminuir."},
+ {a:1,w:2,q:"¿Cómo terminaron sus relaciones anteriores?",o:[["En buenos términos, sin contacto innecesario",4],["Terminaron sin dramas",3],["Habla mal de todas sus ex parejas",1],["Mantiene contacto sospechoso o hay asuntos sin cerrar",0]],f:"Cerró bien sus relaciones pasadas",r:"Asuntos sin cerrar con relaciones pasadas",m:"Hablen abiertamente del pasado. Si siempre culpa a sus ex, pregúntate qué responsabilidad asume."},
+ {a:1,w:3,q:"¿Pueden hablar de lo que sienten sin miedo a su reacción?",o:[["Sí, hablamos de todo",4],["De casi todo",3],["Hay temas que evito para no pelear",1],["No puedo expresar lo que siento",0]],f:"Comunicación emocional abierta",r:"Comunicación emocional bloqueada",m:"Escojan un momento tranquilo para tocar los temas que evitan. Si no es posible, un consejero puede ayudar."},
+
+ {a:2,w:3,q:"¿Cómo trata a los niños (sus hijos, los tuyos o los de la familia)?",o:[["Con paciencia y amor",4],["Bien, aunque a veces se impacienta",3],["Con frialdad o desinterés",1],["Con agresividad o maltrato",0,1]],f:"Trata a los niños con amor y paciencia",r:"Trato inadecuado hacia los niños",m:"Observa cómo reacciona con niños en momentos de estrés. Si hay hijos de por medio, este punto es prioritario."},
+ {a:2,w:3,q:"¿Coinciden en tener hijos y en cómo criarlos?",o:[["Lo hemos hablado y coincidimos",4],["Coincidimos en lo básico",3],["No lo hemos hablado o hay dudas",1],["Queremos cosas incompatibles",0]],f:"Visión compartida sobre los hijos",r:"Visión distinta sobre tener o criar hijos",m:"Hablen de cuántos hijos, cuándo y cómo educarlos (disciplina, fe, escuela) antes de comprometerse."},
+ {a:2,w:2,q:"¿Es responsable con la crianza (tiempo, atención, manutención)?",o:[["Muy responsable",4],["Cumple, aunque con algunas fallas",3],["Cumple poco",1],["Abandona sus responsabilidades",0]],f:"Responsable con la crianza",r:"Poca responsabilidad con la crianza",m:"Si ya tiene hijos, fíjate en cómo cumple hoy: así cumplirá mañana."},
+
+ {a:3,w:2,q:"¿Cómo maneja su dinero?",o:[["Ahorra y planifica",4],["Gasta, pero con control",3],["Gasta de forma impulsiva",1],["Vive con deudas o gastos sin control",0]],f:"Buen manejo del dinero",r:"Manejo impulsivo del dinero",m:"Revisen juntos ingresos, deudas y gastos antes de unir sus finanzas."},
+ {a:3,w:2,q:"¿Tiene estabilidad laboral o una fuente de ingresos?",o:[["Estable y en crecimiento",4],["Estable",3],["Inestable",1],["No trabaja ni le interesa hacerlo",0]],f:"Estabilidad laboral",r:"Inestabilidad laboral",m:"Distingue entre una mala racha y la falta de interés. Lo segundo pesa mucho más."},
+ {a:3,w:2,q:"¿Cómo ve el dinero en pareja?",o:[["Como un equipo: aportamos y decidimos juntos",4],["Cada uno con lo suyo, de forma justa",3],["Espera que yo cargue con todo",1],["Me esconde dinero o me controla económicamente",0,1]],f:"Ve el dinero como un equipo",r:"Desequilibrio o control con el dinero",m:"Acuerden por escrito cómo aportará cada uno a los gastos del hogar."},
+
+ {a:4,w:2,q:"¿Tiene metas claras y trabaja por ellas?",o:[["Sí, y avanza",4],["Tiene metas, pero avanza lento",3],["Habla mucho y hace poco",1],["No tiene rumbo",0]],f:"Tiene metas y avanza hacia ellas",r:"Falta de rumbo o de acción",m:"Pregúntale dónde se ve en cinco años y qué está haciendo hoy para llegar."},
+ {a:4,w:2,q:"¿Quiere crecer como persona (estudiar, mejorar, aprender de sus errores)?",o:[["Siempre busca mejorar",4],["A veces",3],["Rara vez",1],["Cree que no tiene nada que cambiar",0]],f:"Busca crecer como persona",r:"Poca disposición a mejorar",m:"No cuentes con cambiar a alguien que no quiere cambiar. Evalúa a la persona como es hoy."},
+ {a:4,w:2,q:"¿Te impulsa a crecer a ti también?",o:[["Me apoya y celebra mis logros",4],["Me apoya a veces",3],["Le son indiferentes mis metas",1],["Me desanima o compite conmigo",0]],f:"Impulsa tu crecimiento",r:"No apoya tu crecimiento",m:"Comparte tus metas y observa su reacción. Una pareja suma a tu proyecto de vida, no le resta."},
+
+ {a:5,w:3,q:"¿Tiene algún vicio (alcohol, drogas, apuestas, pornografía) que afecte su vida o la relación?",o:[["Ninguno",4],["Consumo social y controlado",3],["Consumo frecuente que causa problemas",1],["Una adicción que no reconoce ni trata",0,1]],f:"Sin vicios que afecten la relación",r:"Vicios o adicciones",m:"Una adicción necesita tratamiento profesional. No avances hasta que la reconozca y la trate."},
+ {a:5,w:2,q:"¿Cómo trata a quienes no le aportan nada (meseros, empleados, desconocidos)?",o:[["Con respeto y amabilidad",4],["Con educación",3],["Con indiferencia o prepotencia",1],["Con desprecio o humillación",0]],f:"Trata con respeto a todos",r:"Trato despectivo hacia los demás",m:"Presta atención a este detalle: con el tiempo, así también te tratará a ti."},
+
+ {a:6,w:3,q:"¿Qué tan cómodo/a y en paz te sientes con esta persona?",o:[["Totalmente: puedo ser yo",4],["Casi siempre",3],["Con frecuencia siento tensión",1],["Siento miedo o ansiedad",0,1]],f:"Te sientes en paz y en libertad",r:"Tensión o miedo en la relación",m:"El miedo nunca es normal en una pareja. Habla con alguien de confianza o con un profesional."},
+ {a:6,w:3,q:"¿Te sientes amado/a por esta persona?",o:[["Sí, me lo demuestra con hechos",4],["Casi siempre",3],["Lo dice, pero no lo demuestra",1],["No me siento amado/a",0]],f:"Te sientes amado/a",r:"No te sientes amado/a",m:"Dile cómo necesitas recibir amor. Si después de hablarlo nada cambia, tómalo en serio."},
+ {a:6,w:2,q:"¿Están conformes con el afecto y la intimidad en la relación?",o:[["Sí, los dos",4],["Casi siempre",3],["Hay diferencias que nos afectan",1],["Hay rechazo o presión constante",0]],f:"Afecto e intimidad en armonía",r:"Desacuerdo en afecto e intimidad",m:"Hablen de sus expectativas con honestidad y sin culpas. Es un tema clave en el matrimonio."},
+ {a:6,w:2,q:"¿Qué opinan de esta persona tus amigos y familiares cercanos?",o:[["Les cae muy bien",4],["Bien, con alguna reserva",3],["Varios me han advertido sobre {e}",1],["Casi todos me dicen que no me conviene",0]],f:"Tu gente cercana aprueba la relación",r:"Advertencias de tu gente cercana",m:"Pregúntales qué ven exactamente. No tienen la última palabra, pero ven lo que el enamoramiento tapa."},
+ {a:6,w:3,q:"¿Por qué quieres dar este paso?",o:[["Por amor, y porque veo un futuro juntos",4],["Por amor, aunque siento algo de presión",3],["Principalmente por presión (edad, familia, sociedad)",1],["Por miedo a quedarme solo/a",0]],f:"Tu motivación es el amor",r:"Decisión movida por presión o miedo",m:"Date tiempo. Una decisión tomada por presión o miedo se suele lamentar después."},
+ {a:6,w:3,q:"Si nada cambiara en 10 años, ¿serías feliz con esta persona?",o:[["Sí, sin duda",4],["Probablemente",3],["Tengo muchas dudas",1],["No",0]],f:"Te ves feliz a largo plazo",r:"No te ves feliz a largo plazo",m:"Esta respuesta pesa más que cualquier puntaje. Escúchala."}
+];
+
+const KEY="gonogo-pareja-v1";
+let S = {name:"", g:"f", ans:{}, step:-1};
+function load(){try{const r=localStorage.getItem(KEY);if(r){const o=JSON.parse(r);if(o&&typeof o==="object")return o}}catch(e){}return null}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function clearSaved(){try{localStorage.removeItem(KEY)}catch(e){}}
+
+const app=document.getElementById("app");
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function who(){return S.name.trim()||"esta persona"}
+function tx(s){
+  const e = S.name.trim() || (S.g==="m"?"él":"ella");
+  return s.replace(/\{e\}/g,e).replace(/esta persona/g,who());
+}
+function areaName(i){const a=AREAS[i];return (S.g==="m"&&a.tM)?a.tM:a.t}
+function qsOf(i){return Q.map((q,idx)=>({...q,idx})).filter(q=>q.a===i)}
+function answeredCount(){return Object.keys(S.ans).length}
+
+/* ---------- INTRO ---------- */
+function renderIntro(){
+  document.getElementById("btnRestartTop").hidden=true;
+  const saved=load();
+  const resumable = saved && saved.ans && Object.keys(saved.ans).length>0;
+  app.innerHTML=`
+  <div class="wrap" style="gap:28px;padding-top:20px">
+    <section class="hero">
+      <span class="eyebrow">Gestión de riesgos aplicada al amor</span>
+      <h1>¿<span class="go">Go</span> o <span class="nogo">No-Go</span>?</h1>
+      <p class="lead">Antes de casarte o formalizar una relación, analízala como un proyecto: pon en la balanza lo que ganas y lo que arriesgas, y toma una decisión con la cabeza fría.</p>
+    </section>
+
+    <section class="panel" aria-labelledby="setupTitle">
+      <h2 id="setupTitle" style="font-size:22px">Antes de empezar</h2>
+      <div class="field">
+        <label class="lbl" for="inName">Nombre o apodo de la persona que vas a evaluar <span class="muted" style="font-weight:400">(opcional)</span></label>
+        <input type="text" id="inName" maxlength="40" placeholder="Ej.: Laura" value="${esc(S.name)}">
+      </div>
+      <div class="field">
+        <span class="lbl" id="gLbl">Esa persona es</span>
+        <div class="seg" role="group" aria-labelledby="gLbl">
+          <button type="button" id="gF" aria-pressed="${S.g==="f"}">Mujer</button>
+          <button type="button" id="gM" aria-pressed="${S.g==="m"}">Hombre</button>
+        </div>
+      </div>
+      <div class="row">
+        <button class="btn primary" id="btnStart">Comenzar evaluación</button>
+        ${resumable?`<button class="btn" id="btnResume">Continuar la evaluación guardada (${Object.keys(saved.ans).length} de ${Q.length})</button>`:""}
+      </div>
+      <p class="note">Son ${Q.length} preguntas en ${AREAS.length} áreas, unos 8 minutos. Tus respuestas no se envían a ningún lado: se guardan solo en este navegador.</p>
+    </section>
+
+    <section class="sec">
+      <h2>Cómo funciona</h2>
+      <div class="how">
+        <div><b>1 · Respondes</b><p>Cada respuesta suma puntos de beneficio o de riesgo. Las preguntas más importantes pesan más.</p></div>
+        <div><b>2 · Se mide el riesgo</b><p>Cada riesgo se ubica en una matriz de probabilidad × impacto, como en un proyecto real.</p></div>
+        <div><b>3 · Decides</b><p>Recibes un informe Go, Go con condiciones o No-Go, con fortalezas, riesgos y qué hacer con cada uno.</p></div>
+      </div>
+    </section>
+
+    <section class="sec">
+      <h2>Áreas que se analizan</h2>
+      <div class="areas-list">${AREAS.map((a,i)=>`<span class="chip">${esc(areaName(i))}</span>`).join("")}</div>
+    </section>
+
+    <section class="sample" aria-label="Ejemplo de informe">
+      <div class="ring" style="width:104px;height:104px">${ringSVG(68,"var(--cond)")}<div class="num"><b style="font-size:24px">68%</b></div></div>
+      <div style="display:flex;flex-direction:column;gap:6px;min-width:0">
+        <span class="tag">Ejemplo de informe</span>
+        <strong style="font-family:var(--display);font-size:24px;color:var(--cond)">Go con condiciones</strong>
+        <p class="muted" style="font-size:14px">Fortalezas en familia y crecimiento. Riesgo alto en manejo de conflictos: conviene hablarlo antes del compromiso.</p>
+      </div>
+    </section>
+
+    <p class="disclaimer">Esta herramienta sirve para reflexionar con orden. No es un diagnóstico psicológico ni reemplaza el consejo de un profesional. Si en tu relación hay violencia o miedo, busca ayuda de personas de confianza o de un profesional.</p>
+  </div>`;
+  const inName=document.getElementById("inName");
+  inName.addEventListener("input",()=>{S.name=inName.value});
+  const setG=g=>{S.g=g;document.getElementById("gF").setAttribute("aria-pressed",g==="f");document.getElementById("gM").setAttribute("aria-pressed",g==="m");
+    document.querySelector(".areas-list").innerHTML=AREAS.map((a,i)=>`<span class="chip">${esc(areaName(i))}</span>`).join("")};
+  document.getElementById("gF").onclick=()=>setG("f");
+  document.getElementById("gM").onclick=()=>setG("m");
+  document.getElementById("btnStart").onclick=()=>{S.ans={};S.step=0;save();renderStep()};
+  const r=document.getElementById("btnResume");
+  if(r) r.onclick=()=>{S=Object.assign({name:"",g:"f",ans:{},step:0},saved);if(S.step<0)S.step=0;renderStep()};
+}
+
+/* ---------- PASOS ---------- */
+function areaComplete(i){return qsOf(i).every(q=>S.ans[q.idx]!==undefined)}
+function renderStep(){
+  document.getElementById("btnRestartTop").hidden=false;
+  const i=S.step, a=AREAS[i], qs=qsOf(i);
+  const pct=Math.round(answeredCount()/Q.length*100);
+  let maxReach=0; for(let k=0;k<AREAS.length;k++){ if(k<=S.step || areaComplete(k-1)) maxReach=k; }
+  app.innerHTML=`
+  <div class="wrap" style="gap:22px;padding-top:20px">
+    <nav class="stepper" aria-label="Áreas">
+      ${AREAS.map((x,k)=>`<button class="step-chip ${k===i?"current":areaComplete(k)?"done":""}" data-k="${k}" ${k>maxReach&&!areaComplete(k)?"disabled":""}>${esc(areaName(k))}</button>`).join("")}
+    </nav>
+    <div class="progress" aria-label="Progreso"><span style="width:${pct}%"></span></div>
+    <div class="area-head">
+      <span class="eyebrow">Área ${i+1} de ${AREAS.length} · ${answeredCount()} de ${Q.length} respondidas</span>
+      <h2>${esc(areaName(i))}</h2>
+      <p class="muted">${esc(i===6?a.d:tx(a.d))}</p>
+    </div>
+    ${a.hint?`<p class="hint">${esc(a.hint)}</p>`:""}
+    <form id="f" class="wrap" style="gap:14px" novalidate>
+      ${qs.map(q=>`
+      <div class="q" id="q${q.idx}" role="radiogroup" aria-labelledby="h${q.idx}">
+        <div class="q-top">
+          <h3 id="h${q.idx}">${esc(tx(q.q))}</h3>
+          <span class="weight" title="Importancia: ${q.w===3?"alta":"media"}" aria-label="Importancia ${q.w===3?"alta":"media"}">${[1,2,3].map(n=>`<i class="${n<=q.w?"on":""}"></i>`).join("")}</span>
+        </div>
+        <div class="opts">
+          ${q.o.map((o,j)=>`<div class="opt">
+            <input type="radio" name="q${q.idx}" id="q${q.idx}o${j}" value="${j}" ${S.ans[q.idx]===j?"checked":""}>
+            <label for="q${q.idx}o${j}"><span class="dot" aria-hidden="true"></span><span>${esc(tx(o[0]))}</span></label>
+          </div>`).join("")}
+        </div>
+      </div>`).join("")}
+    </form>
+    <p class="err" id="err" hidden></p>
+    <div class="nav">
+      <button class="btn" id="btnPrev">${i===0?"Volver al inicio":"Anterior"}</button>
+      <button class="btn primary" id="btnNext">${i===AREAS.length-1?"Ver mi informe":"Siguiente"}</button>
+    </div>
+  </div>`;
+  app.querySelectorAll("input[type=radio]").forEach(r=>r.addEventListener("change",()=>{
+    const idx=+r.name.slice(1); S.ans[idx]=+r.value; save();
+    document.getElementById("q"+idx).classList.remove("missing");
+    const p=Math.round(answeredCount()/Q.length*100); app.querySelector(".progress span").style.width=p+"%";
+    app.querySelector(".area-head .eyebrow").textContent=`Área ${i+1} de ${AREAS.length} · ${answeredCount()} de ${Q.length} respondidas`;
+  }));
+  app.querySelectorAll(".step-chip").forEach(b=>b.onclick=()=>{S.step=+b.dataset.k;save();renderStep();scrollTo(0,0)});
+  document.getElementById("btnPrev").onclick=()=>{ if(i===0){S.step=-1;save();renderIntro()} else {S.step--;save();renderStep()} scrollTo(0,0)};
+  document.getElementById("btnNext").onclick=()=>{
+    const missing=qs.filter(q=>S.ans[q.idx]===undefined);
+    if(missing.length){
+      missing.forEach(q=>document.getElementById("q"+q.idx).classList.add("missing"));
+      const e=document.getElementById("err"); e.hidden=false;
+      e.textContent=missing.length===1?"Falta 1 pregunta por responder en esta área.":`Faltan ${missing.length} preguntas por responder en esta área.`;
+      document.getElementById("q"+missing[0].idx).scrollIntoView({behavior:"smooth",block:"center"});
+      return;
+    }
+    if(i===AREAS.length-1){
+      const firstOpen=AREAS.findIndex((_,k)=>!areaComplete(k));
+      if(firstOpen>=0){S.step=firstOpen;save();renderStep();scrollTo(0,0);return}
+      S.step=99; save(); renderReport();
+    } else {S.step++;save();renderStep()}
+    scrollTo(0,0);
+  };
+}
+
+/* ---------- CÁLCULO ---------- */
+const P_OF={4:1,3:2,1:4,0:5};          // probabilidad de que el riesgo ocurra
+const I_OF={3:5,2:3,1:2};              // impacto según peso
+function zone(sev){return sev>=15?"high":sev>=8?"mid":"low"}
+function compute(){
+  let ben=0,risk=0; const areas=AREAS.map(()=>({b:0,max:0}));
+  const flags=[],strengths=[],risks=[],matrix={};
+  Q.forEach((q,idx)=>{
+    const j=S.ans[idx]; const opt=q.o[j]; const s=opt[1];
+    ben+=q.w*s; risk+=q.w*(4-s);
+    areas[q.a].b+=q.w*s; areas[q.a].max+=q.w*4;
+    if(opt[2]) flags.push({q,opt});
+    if(s===4) strengths.push(q);
+    if(s<4){
+      const P=P_OF[s],I=I_OF[q.w],sev=P*I;
+      const key=P+"-"+I; matrix[key]=(matrix[key]||0)+1;
+      if(s<=1) risks.push({q,opt,P,I,sev});
+    }
+  });
+  risks.sort((x,y)=>y.sev-x.sev||y.q.w-x.q.w);
+  strengths.sort((x,y)=>y.w-x.w);
+  const p=Math.round(ben/(ben+risk)*100);
+  const highs=risks.filter(r=>r.sev>=15).length;
+  let v;
+  if(flags.length) v="nogo";
+  else if(p>=75 && highs<=1) v="go";
+  else if(p>=55) v="cond";
+  else v="nogo";
+  return {ben,risk,p,areas:areas.map((x,i)=>({i,pct:Math.round(x.b/x.max*100)})),flags,strengths,risks,matrix,highs,v};
+}
+const VLABEL={go:"Go",cond:"Go con condiciones",nogo:"No-Go"};
+function verdictText(R){
+  if(R.v==="go") return {sub:`Los beneficios superan con claridad a los riesgos. La relación con ${who()} tiene una base sólida.`,
+    reco:`Puedes avanzar con confianza. Aun así, ningún proyecto está libre de riesgos: cuida los puntos señalados abajo y hablen de ellos antes de que crezcan.`};
+  if(R.v==="cond") return {sub:`Hay una buena base, pero también riesgos que no conviene ignorar.`,
+    reco:`Vale la pena, pero todavía no es el momento de comprometerte. Habla con ${who()} de los riesgos marcados y acuerden cómo mitigarlos. Si las cosas mejoran en los próximos meses, repite esta evaluación.`};
+  if(R.flags.length) return {sub:`Marcaste al menos una bandera roja. En gestión de riesgos, un riesgo inaceptable detiene el proyecto, sin importar los beneficios.`,
+    reco:`No avances por ahora. Las banderas rojas no se compensan con cualidades. Si en la relación hay violencia, control o miedo, busca el apoyo de personas de confianza o de un profesional. Mereces estar con alguien con quien te sientas en paz, y puede ser mejor esperar a esa persona.`};
+  return {sub:`Los riesgos pesan más que los beneficios en esta relación.`,
+    reco:`Lo más prudente es no avanzar por ahora. Si decides seguir, hazlo solo después de que los riesgos principales cambien de verdad, no por promesas. También es válido esperar a otra persona que se ajuste mejor a lo que buscas.`};
+}
+function colorFor(p){return p>=75?"var(--go)":p>=55?"var(--cond)":"var(--nogo)"}
+function ringSVG(p,color){
+  const r=52,c=2*Math.PI*r;
+  return `<svg viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="${r}" fill="none" stroke="var(--sunk)" stroke-width="12"/><circle cx="60" cy="60" r="${r}" fill="none" stroke="${color}" stroke-width="12" stroke-linecap="round" stroke-dasharray="${c*p/100} ${c}"/></svg>`;
+}
+
+/* ---------- INFORME ---------- */
+function renderReport(){
+  document.getElementById("btnRestartTop").hidden=false;
+  const R=compute(), T=verdictText(R);
+  const vColor={go:"var(--go)",cond:"var(--cond)",nogo:"var(--nogo)"}[R.v];
+  const sevLabel={high:"Riesgo alto",mid:"Riesgo medio",low:"Riesgo bajo"};
+  // Matriz: filas probabilidad 5..1, columnas impacto 1..5
+  let cells="";
+  for(let P=5;P>=1;P--){
+    cells+=`<div class="ax">${P}</div>`;
+    for(let I=1;I<=5;I++){const n=R.matrix[P+"-"+I]||0;cells+=`<div class="cell z-${zone(P*I)}" title="Probabilidad ${P} × Impacto ${I} = ${P*I}">${n?`<span class="n">${n}</span>`:""}</div>`}
+  }
+  cells+=`<div></div>`+[1,2,3,4,5].map(I=>`<div class="ax">${I}</div>`).join("");
+  const totalRisks=Object.values(R.matrix).reduce((a,b)=>a+b,0);
+
+  app.innerHTML=`
+  <div class="wrap" style="gap:30px;padding-top:20px">
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <span class="eyebrow">Informe de decisión · ${esc(who())}</span>
+      <h1 style="font-size:clamp(28px,5vw,36px)">Resultado del análisis</h1>
+    </div>
+
+    <section class="verdict ${R.v}">
+      <div style="min-width:0">
+        <span class="eyebrow">Decisión</span>
+        <div class="v">${VLABEL[R.v]}</div>
+        <p class="sub">${esc(T.sub)}</p>
+      </div>
+      <div class="ring">${ringSVG(R.p,vColor)}<div class="num"><div><b>${R.p}%</b><small>probabilidad estimada de éxito</small></div></div></div>
+    </section>
+
+    <section class="balance" aria-label="Balance de beneficio y riesgo">
+      <div class="bar"><div class="b" style="width:${R.p}%"></div><div class="r" style="width:${100-R.p}%"></div></div>
+      <div class="legend"><span><span class="sw" style="background:var(--go)"></span>Beneficio: <b class="mono">${R.ben}</b> puntos</span><span><span class="sw" style="background:var(--nogo)"></span>Riesgo: <b class="mono">${R.risk}</b> puntos</span></div>
+    </section>
+
+    ${R.flags.length?`<section class="flags"><h3>Banderas rojas (${R.flags.length})</h3><p>Estas respuestas son riesgos inaceptables y por sí solas llevan a No-Go:</p><ul>${R.flags.map(f=>`<li><b>${esc(f.q.r)}</b>: “${esc(tx(f.opt[0]))}”</li>`).join("")}</ul></section>`:""}
+
+    <section class="sec">
+      <h2>Resultado por área</h2>
+      <div class="areas">${R.areas.map(a=>`<div class="arow"><span class="name">${esc(areaName(a.i))}</span><div class="track"><div class="fill" style="width:${a.pct}%;background:${colorFor(a.pct)}"></div></div><span class="pct mono">${a.pct}%</span></div>`).join("")}</div>
+    </section>
+
+    <section class="sec">
+      <h2>Matriz de riesgos</h2>
+      <div class="matrix-wrap">
+        <div style="overflow-x:auto">
+          <div style="display:flex;gap:6px;align-items:center">
+            <span class="ax" style="writing-mode:vertical-rl;transform:rotate(180deg)">Probabilidad →</span>
+            <div><div class="matrix" role="img" aria-label="Matriz de probabilidad por impacto con ${totalRisks} riesgos">${cells}</div>
+            <div class="ax" style="margin-top:4px;padding-left:22px">Impacto →</div></div>
+          </div>
+        </div>
+        <div class="matrix-legend">
+          <p>Cada número indica cuántos riesgos caen en esa casilla. Severidad = <b>probabilidad × impacto</b> (de 1 a 25).</p>
+          <span><span class="sw" style="background:var(--nogo-soft);outline:1px solid var(--nogo)"></span>Alto (15–25): atender antes de decidir</span>
+          <span><span class="sw" style="background:var(--cond-soft);outline:1px solid var(--cond)"></span>Medio (8–14): hablarlo y vigilarlo</span>
+          <span><span class="sw" style="background:var(--go-soft);outline:1px solid var(--go)"></span>Bajo (1–7): aceptable</span>
+          <p class="muted">${totalRisks===0?"No se detectaron riesgos.":`${totalRisks} puntos con algún nivel de riesgo, ${R.highs} de nivel alto.`}</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="sec">
+      <h2>Riesgos y cómo mitigarlos</h2>
+      ${R.risks.length?`<div class="list">${R.risks.map(r=>`
+        <div class="item">
+          <div class="meta"><span class="pill ${zone(r.sev)}">${sevLabel[zone(r.sev)]} · ${r.P}×${r.I}=${r.sev}</span><span class="pill area">${esc(areaName(r.q.a))}</span>${r.opt[2]?`<span class="pill high">Bandera roja</span>`:""}</div>
+          <b>${esc(r.q.r)}</b>
+          <p class="muted">Respuesta: “${esc(tx(r.opt[0]))}”</p>
+          <p><b>Qué hacer:</b> ${esc(r.q.m)}</p>
+        </div>`).join("")}</div>`:`<p class="muted">No marcaste riesgos importantes. Las respuestas intermedias aparecen en la matriz como riesgos bajos o medios.</p>`}
+    </section>
+
+    <section class="sec">
+      <h2>Fortalezas (${R.strengths.length})</h2>
+      ${R.strengths.length?`<div class="strengths">${R.strengths.map(q=>`<div>${esc(q.f)}</div>`).join("")}</div>`:`<p class="muted">Ninguna respuesta alcanzó el puntaje máximo.</p>`}
+    </section>
+
+    <section class="reco">
+      <span class="eyebrow">Recomendación final</span>
+      <p>${esc(T.reco)}</p>
+    </section>
+
+    <div class="row">
+      <button class="btn primary" id="btnCopy">Copiar informe</button>
+      <button class="btn" id="btnReview">Revisar respuestas</button>
+      <button class="btn" id="btnNew">Nueva evaluación</button>
+    </div>
+    <div id="copyFallback" hidden><p class="note">Selecciona y copia el texto:</p><textarea class="fallback" id="copyTa" readonly></textarea></div>
+
+    <p class="disclaimer">La probabilidad es una estimación basada en tus respuestas, no una predicción científica. Esta herramienta sirve para reflexionar con orden y no reemplaza a un profesional. Si en tu relación hay violencia o miedo, busca ayuda.</p>
+  </div>`;
+
+  document.getElementById("btnReview").onclick=()=>{S.step=0;save();renderStep();scrollTo(0,0)};
+  document.getElementById("btnNew").onclick=newEval;
+  document.getElementById("btnCopy").onclick=()=>{
+    const txt=reportText(R,T);
+    const ok=()=>toast("Informe copiado");
+    const fail=()=>{const box=document.getElementById("copyFallback");box.hidden=false;const ta=document.getElementById("copyTa");ta.value=txt;ta.focus();ta.select()};
+    try{navigator.clipboard.writeText(txt).then(ok,fail)}catch(e){fail()}
+  };
+}
+function reportText(R,T){
+  const L=[];
+  L.push(`GO / NO-GO DE PAREJA · Informe sobre ${who()}`);
+  L.push(`Decisión: ${VLABEL[R.v].toUpperCase()}`);
+  L.push(`Probabilidad estimada de éxito: ${R.p}% (beneficio ${R.ben} pts · riesgo ${R.risk} pts)`);
+  L.push("");
+  if(R.flags.length){L.push("Banderas rojas:");R.flags.forEach(f=>L.push(`- ${f.q.r}`));L.push("")}
+  L.push("Resultado por área:");R.areas.forEach(a=>L.push(`- ${areaName(a.i)}: ${a.pct}%`));
+  L.push("");
+  if(R.risks.length){L.push("Riesgos principales:");R.risks.forEach(r=>L.push(`- [${r.sev}/25] ${r.q.r}. Qué hacer: ${r.q.m}`));L.push("")}
+  if(R.strengths.length){L.push("Fortalezas:");R.strengths.forEach(q=>L.push(`- ${q.f}`));L.push("")}
+  L.push("Recomendación: "+T.reco);
+  return L.join("\n");
+}
+function newEval(){S={name:"",g:"f",ans:{},step:-1};clearSaved();renderIntro();scrollTo(0,0)}
+let tt;function toast(m){const t=document.getElementById("toast");t.textContent=m;t.hidden=false;clearTimeout(tt);tt=setTimeout(()=>t.hidden=true,2200)}
+
+document.getElementById("btnRestartTop").onclick=newEval;
+
+// Arranque
+const saved=load();
+if(saved && saved.step===99 && saved.ans && Object.keys(saved.ans).length===Q.length){S=saved;renderReport()}
+else renderIntro();
+})();
+</script>
+</body>
+</html>
